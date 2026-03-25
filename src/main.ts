@@ -1,60 +1,211 @@
 import './style.css'
-import typescriptLogo from './assets/typescript.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import { setupCounter } from './counter.ts'
+import { auth } from './firebase'
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  onAuthStateChanged,
+  signOut,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "firebase/auth";
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${typescriptLogo}" class="framework" alt="TypeScript logo"/>
-    <img src=${viteLogo} class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.ts</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
+const appDiv = document.querySelector<HTMLDivElement>('#app')!;
 
-<div class="ticks"></div>
+function renderLanding() {
+  appDiv.innerHTML = `
+    <div class="auth-container">
+      <div class="logo-container" id="logo-trigger">
+        <div style="font-size: 3rem; font-weight: bold; color: var(--mel-pink); border: 4px solid var(--mel-pink); padding: 20px; border-radius: 20px;">
+          Mel in a Box
+        </div>
+        <p style="margin-top: 10px; font-weight: 500;">Click to get started</p>
+      </div>
+      
+      <div class="auth-actions" id="auth-buttons">
+        <button class="btn btn-primary" id="go-login">Log In</button>
+        <button class="btn btn-outline" id="go-signup">Sign Up</button>
+      </div>
+    </div>
+  `;
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src=${viteLogo} alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://www.typescriptlang.org" target="_blank">
-          <img class="button-icon" src="${typescriptLogo}" alt="">
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
+  const logoTrigger = document.getElementById('logo-trigger')!;
+  const authButtons = document.getElementById('auth-buttons')!;
+  const goLogin = document.getElementById('go-login')!;
+  const goSignup = document.getElementById('go-signup')!;
 
-<div class="ticks"></div>
-<section id="spacer"></section>
-`
+  logoTrigger.addEventListener('click', () => {
+    authButtons.classList.toggle('visible');
+  });
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+  goLogin.addEventListener('click', renderLogin);
+  goSignup.addEventListener('click', renderSignup);
+}
+
+function renderLogin() {
+  appDiv.innerHTML = `
+    <div class="auth-container">
+      <div class="auth-card">
+        <div style="color: var(--mel-pink); font-size: 2rem; margin-bottom: 20px;">💖</div>
+        <h2>Log in to your account</h2>
+        <p>Welcome back! Please enter your details.</p>
+        
+        <form id="login-form">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="login-email" placeholder="Enter your email" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="login-password" placeholder="••••••••" required>
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 1rem;">
+            <label><input type="checkbox"> Remember for 30 days</label>
+            <a href="#" style="color: var(--mel-pink); text-decoration: none;">Forgot password</a>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-full">Sign in</button>
+        </form>
+        
+        <button class="google-btn" id="google-login">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+          Sign in with Google
+        </button>
+        
+        <div class="auth-footer">
+          Don't have an account? <a href="#" id="link-signup">Sign up</a>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('login-form')!.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = (document.getElementById('login-email') as HTMLInputElement).value;
+    const password = (document.getElementById('login-password') as HTMLInputElement).value;
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      alert('Logged in successfully!');
+    } catch (error: any) {
+      alert(error.message);
+    }
+  });
+
+  document.getElementById('google-login')!.addEventListener('click', async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      alert('Logged in with Google!');
+    } catch (error: any) {
+      alert(error.message);
+    }
+  });
+
+  document.getElementById('link-signup')!.addEventListener('click', (e) => {
+    e.preventDefault();
+    renderSignup();
+  });
+}
+
+function renderSignup() {
+  appDiv.innerHTML = `
+    <div class="auth-container">
+      <div class="auth-card">
+        <div style="color: var(--mel-pink); font-size: 2rem; margin-bottom: 20px;">✨</div>
+        <h2>Create your account</h2>
+        <p>Please enter your details.</p>
+        
+        <form id="signup-form">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="signup-name" placeholder="Enter your name" required>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="signup-email" placeholder="Enter your email" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="signup-password" placeholder="••••••••" required>
+          </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" id="signup-confirm" placeholder="••••••••" required>
+          </div>
+          
+          <div style="text-align: left; font-size: 0.8rem; margin-bottom: 1rem;">
+            <label><input type="checkbox" required> I agree to the Terms of Service, Privacy Policy, and Cookie Policy</label>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-full">Sign Up</button>
+        </form>
+        
+        <button class="google-btn" id="google-signup-btn">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+          Sign in with Google
+        </button>
+        
+        <div class="auth-footer">
+          Already have an account? <a href="#" id="link-login">Sign In</a>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('signup-form')!.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = (document.getElementById('signup-email') as HTMLInputElement).value;
+    const password = (document.getElementById('signup-password') as HTMLInputElement).value;
+    const confirm = (document.getElementById('signup-confirm') as HTMLInputElement).value;
+
+    if (password !== confirm) {
+      alert('Passwords do not match');
+      return;
+    }
+
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      alert('Account created successfully!');
+    } catch (error: any) {
+      alert(error.message);
+    }
+  });
+
+  document.getElementById('google-signup-btn')!.addEventListener('click', async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      alert('Signed up with Google!');
+    } catch (error: any) {
+      alert(error.message);
+    }
+  });
+
+  document.getElementById('link-login')!.addEventListener('click', (e) => {
+    e.preventDefault();
+    renderLogin();
+  });
+}
+
+function renderDashboard(user: any) {
+  appDiv.innerHTML = `
+    <div class="auth-container">
+      <h1>Welcome, ${user.email}</h1>
+      <p>Successfully authenticated!</p>
+      <button class="btn btn-secondary" id="logout">Logout</button>
+    </div>
+  `;
+
+  document.getElementById('logout')!.addEventListener('click', () => {
+    signOut(auth);
+  });
+}
+
+// Initial session check
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    renderDashboard(user);
+  } else {
+    renderLanding();
+  }
+});

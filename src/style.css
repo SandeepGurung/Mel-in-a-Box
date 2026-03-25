@@ -15,6 +15,12 @@
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
+  /* Mel in a Box Pink Theme */
+  --mel-pink: #ff4d6d;
+  --mel-pink-light: #fff0f3;
+  --mel-pink-hover: #ff758f;
+  --mel-glass: rgba(255, 255, 255, 0.8);
+
   font: 18px/145% var(--sans);
   letter-spacing: 0.18px;
   color-scheme: light dark;
@@ -273,24 +279,154 @@ code {
   }
 }
 
-.ticks {
-  position: relative;
+/* Authentication Styles */
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.logo-container {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.logo-container:hover {
+  transform: scale(1.05);
+}
+
+.logo-container img {
+  max-width: 300px;
+  height: auto;
+}
+
+.auth-actions {
+  display: flex;
+  gap: 1rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+  pointer-events: none;
+}
+
+.auth-actions.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-primary {
+  background: var(--mel-pink);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--mel-pink-hover);
+}
+
+.btn-secondary {
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--mel-pink);
+    color: var(--mel-pink);
+}
+
+/* Form Styles */
+.auth-card {
+  background: var(--mel-glass);
+  backdrop-filter: blur(10px);
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
   width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
+.auth-card h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
-  }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
-  }
+.auth-card p {
+  color: #666;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.form-group {
+  text-align: left;
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.btn-full {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: white;
+  border: 1px solid var(--border);
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 1rem;
+  font-weight: 500;
+}
+
+.google-btn img {
+  width: 20px;
+}
+
+.auth-footer {
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+}
+
+.auth-footer a {
+  color: var(--mel-pink);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.hidden {
+  display: none !important;
 }
