@@ -1,8 +1,8 @@
 import './style.css'
 import { auth } from './firebase'
-import { 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
   GoogleAuthProvider,
@@ -15,9 +15,7 @@ function renderLanding() {
   appDiv.innerHTML = `
     <div class="auth-container">
       <div class="logo-container" id="logo-trigger">
-        <div style="font-size: 3rem; font-weight: bold; color: var(--mel-pink); border: 4px solid var(--mel-pink); padding: 20px; border-radius: 20px;">
-          Mel in a Box
-        </div>
+        <img src="/src/assets/logo.png" alt="Mel in a Box Logo" class="landing-logo">
         <p style="margin-top: 10px; font-weight: 500;">Click to get started</p>
       </div>
       
@@ -45,9 +43,7 @@ function renderLogin() {
   appDiv.innerHTML = `
     <div class="auth-container">
       <div class="auth-card">
-        <div style="color: var(--mel-pink); font-size: 2rem; margin-bottom: 20px;">💖</div>
-        <h2>Log in to your account</h2>
-        <p>Welcome back! Please enter your details.</p>
+        <h2>Log in</h2>
         
         <form id="login-form">
           <div class="form-group">
@@ -111,9 +107,8 @@ function renderSignup() {
   appDiv.innerHTML = `
     <div class="auth-container">
       <div class="auth-card">
-        <div style="color: var(--mel-pink); font-size: 2rem; margin-bottom: 20px;">✨</div>
         <h2>Create your account</h2>
-        <p>Please enter your details.</p>
+        <p>Sign up</p>
         
         <form id="signup-form">
           <div class="form-group">
