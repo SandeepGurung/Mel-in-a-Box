@@ -15,7 +15,7 @@ function renderLanding() {
   appDiv.innerHTML = `
     <div class="auth-container">
       <div class="logo-container" id="logo-trigger">
-        <img src="/src/assets/logo.png" alt="Mel in a Box Logo" class="landing-logo">
+        <img src="/logo.png" alt="Mel in a Box Logo" class="landing-logo">
         <p style="margin-top: 10px; font-weight: 500;">Click to get started</p>
       </div>
       
